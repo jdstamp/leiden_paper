@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "leiden-paper"
+version = "0.1.0"
+description = ""
+authors = [""]
+readme = "README.md"
+packages = [{include = "leiden_paper"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+jupyter = "^1.0.0"
+demesdraw = "^0.4.0"
+stdpopsim = "^0.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
