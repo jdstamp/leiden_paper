@@ -8,7 +8,7 @@ gcta 1.94.1
 stdpopsim  
 msprime  
 pandas   
-numpy 
+numpy  
 random  
 
 ## To add:
