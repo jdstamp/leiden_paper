@@ -12,7 +12,7 @@ numpy
 random
 
 ## To add:
-1.) Script for generating PCA and PC adjusted phenotypes
+1.) Script for generating PCA and PC adjusted phenotypes \n
 2.) Scripts for running epistasis software
 3.) Script for testing output (QQ-plots, Type 1 error rate)
 
