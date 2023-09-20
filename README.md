@@ -5,10 +5,8 @@ Collaboration on code for the "A multidisciplinary approach to epistasis detecti
 plink1.9  
 gcta 1.94.1  
 msprime  
-pandas   
 
 See `pyproject.toml` for python dependencies.
-random  
 
 ## To add:
 1.) Script for generating PCA and PC adjusted phenotypes  
