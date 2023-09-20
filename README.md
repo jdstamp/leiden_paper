@@ -2,7 +2,6 @@
 Collaboration on code for the "A multidisciplinary approach to epistasis detection" conference review paper.
 
 ## Requirements (Should provide specific versions for users):
-Python 3.6+  
 plink1.9  
 gcta 1.94.1  
 msprime  
