@@ -5,7 +5,6 @@ Collaboration on code for the "A multidisciplinary approach to epistasis detecti
 Python 3.6+  
 plink1.9  
 gcta 1.94.1  
-stdpopsim  
 msprime  
 pandas   
 numpy  
