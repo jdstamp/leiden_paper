@@ -4,7 +4,7 @@ Collaboration on code for the "A multidisciplinary approach to epistasis detecti
 ## Requirements (Should provide specific versions for users):
 plink1.9  
 gcta 1.94.1  
-msprime  
+msprime
 
 See `pyproject.toml` for python dependencies.
 
