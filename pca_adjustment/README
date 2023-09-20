@@ -1,0 +1,5 @@
+## Scripts and resources to run plink PCA on simulated data (Genotype simulation folder) with LD pruning and high LD regions removed and adjust a quantitative phenotype:
+### Order to run in:
+1.) python pruned_pca.py (Uses external file "high-ld-hg19-regions.txt")
+2.) python correct_phenotypes_pca_popstruct.py (Uses R script "phenotype_pc_regression.R") 
+
