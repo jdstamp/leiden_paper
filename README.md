@@ -7,7 +7,6 @@ plink1.9
 gcta 1.94.1  
 msprime  
 pandas   
-numpy  
 
 See `pyproject.toml` for python dependencies.
 random  
