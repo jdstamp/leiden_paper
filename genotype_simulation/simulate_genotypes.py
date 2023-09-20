@@ -4,7 +4,7 @@ import msprime
 
 def simulate():
     n_samples = 1000
-    sequence_length = 100000000
+    sequence_length = 100_000_000
     file_prefix = "stdpopsim"
     species = stdpopsim.get_species("HomSap")
     demo = species.get_demographic_model("AmericanAdmixture_4B11")
