@@ -32,7 +32,7 @@ def main():
         plink.epistasis(file_prefix, traits_file)
 
         adjusted_traits_file = f"{traits_file}.pca_adjusted"
-        correct_traits.pc_adjust(f"{traits_file}.phen", f"{file_prefix}.eigenvec", f"{adjusted_traits_file}.phen")
+        correct_traits.pc_adjust(f"{traits_file}.phen", f"{file_prefix}_pruned.eigenvec", f"{adjusted_traits_file}.phen")
         plink.epistasis(file_prefix, adjusted_traits_file)
 
 if __name__ == "__main__":
