@@ -22,9 +22,14 @@ def main():
     n_causal = 100
     heritability = 1
 
+    # variant pruning parameters
+    window_size = 1000
+    step_size = 50
+    r2_threshold = 0.2
+
     geno.msprime_sims(data_path, data_set, n_samples, sequence_length)
     vcf.vcf_to_plink(data_path, data_set, maf=maf, thin_count=thin_count)
-    plink.pca(file_prefix)
+    plink.pca(file_prefix, window_size, step_size, r2_threshold)
 
     for j in range(num_traits):
         traits_file = os.path.join(data_path, f"{data_set}_trait_{j+1:02d}")
