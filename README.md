@@ -5,6 +5,7 @@ Collaboration on code for the "A multidisciplinary approach to epistasis detecti
 plink1.9  
 gcta 1.94.1  
 msprime
+data.table (R package)
 
 See `pyproject.toml` for python dependencies.
 
