@@ -5,7 +5,7 @@ import simulations.vcf_to_plink as vcf
 import simulations.simulate_traits as traits
 import simulations.run_plink_gwas as plink
 import simulations.correct_traits_pca as correct_traits
-
+import simulations.plot_qq_plot_with_offset as qqplotter
 def main():
     data_path = "data/"
     data_set = "stdpopsim"
@@ -39,6 +39,8 @@ def main():
         adjusted_traits_file = f"{traits_file}.pca_adjusted"
         correct_traits.pc_adjust(f"{traits_file}.phen", f"{file_prefix}_pruned_pca.eigenvec", f"{adjusted_traits_file}.phen")
         plink.epistasis(file_prefix, adjusted_traits_file)
+        qqplotter.qqplot(traits_file , thin_count)
+        qqplotter.qqplot(adjusted_traits_file, thin_count)
 
 if __name__ == "__main__":
     main()
