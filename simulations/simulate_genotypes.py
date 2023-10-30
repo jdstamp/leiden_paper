@@ -4,8 +4,7 @@ import stdpopsim
 import msprime
 
 
-def msprime_sims(data_path, data_set, n_samples, sequence_length):
-    file_prefix = os.path.join(data_path, data_set)
+def msprime_sims(file_prefix, n_samples, sequence_length):
     species = stdpopsim.get_species("HomSap")
     demo = species.get_demographic_model("AmericanAdmixture_4B11")
     ts = msprime.sim_ancestry(

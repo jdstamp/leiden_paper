@@ -2,8 +2,7 @@ import os
 from subprocess import run
 
 
-def vcf_to_plink(data_path, data_set, maf, thin_count):
-    file_prefix = os.path.join(data_path, data_set)
+def vcf_to_plink(file_prefix, maf, thin_count):
     plink_convert_cmd = (
         f"plink --vcf {file_prefix}.vcf --maf {maf} --out {file_prefix} --make-bed"
     )
