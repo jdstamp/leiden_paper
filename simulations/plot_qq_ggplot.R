@@ -27,7 +27,7 @@ gg <- df %>% ggplot(mapping = aes(
   stat_qq_line(distribution = di, detrend = de) +
   stat_qq_point(distribution = di, detrend = de) +
   facet_grid(n_causal ~  adjusted + heritability) +
-  # theme(legend.position = "none") +
+  theme(legend.position = "none") +
   labs(x = bquote("Theoretical Quantiles " -log[10](p)),
        y = bquote("Sample Quantiles " -log[10](p)))
 
