@@ -17,15 +17,15 @@ def main():
     file_prefix = os.path.join(data_path, data_set)
 
     # genotype simulation parameters
-    n_samples = 10
-    sequence_length = 1_000_000
+    n_samples = 2500
+    sequence_length = 10_000_000
     maf = 0.05
-    thin_count = 1000
+    thin_count = 10000
 
     # trait simulation parameters
-    num_traits = 3
-    n_causal = [100, 500]
-    heritability = [0.0, 0.3]
+    num_traits = 100
+    n_causal = [100, 1000]
+    heritability = [0.0, 0.5]
     parameters = list(itertools.product(n_causal, heritability))
 
     # variant pruning parameters
@@ -45,20 +45,22 @@ def main():
         p_values = []
         p_values_pca_adjusted = []
         for j in range(num_traits):
-            traits_file = os.path.join(data_path, f"{data_set}_n{n_causal}_h{heritability}_trait_{j+1:02d}")
+            traits_file = os.path.join(
+                data_path, f"{data_set}_n{n_causal}_h{heritability}_trait_{j+1:02d}")
             adjusted_traits_file = f"{traits_file}.pca_adjusted"
 
             traits.gcta(file_prefix, traits_file, n_causal, heritability)
-            correct_traits.pc_adjust(f"{traits_file}.phen", f"{file_prefix}_pruned_pca.eigenvec", f"{adjusted_traits_file}.phen")
+            correct_traits.pc_adjust(
+                f"{traits_file}.phen", f"{file_prefix}_pruned_pca.eigenvec", f"{adjusted_traits_file}.phen")
 
             plink.epistasis(file_prefix, traits_file)
             plink.epistasis(file_prefix, adjusted_traits_file)
 
-
             df = pd.read_csv(f"{traits_file}.epi.qt", delim_whitespace=True)
             p_values.append(df.dropna())
 
-            df = pd.read_csv(f"{adjusted_traits_file}.epi.qt", delim_whitespace=True)
+            df = pd.read_csv(
+                f"{adjusted_traits_file}.epi.qt", delim_whitespace=True)
             p_values_pca_adjusted.append(df.dropna())
 
         pv_df = pd.concat(p_values)
