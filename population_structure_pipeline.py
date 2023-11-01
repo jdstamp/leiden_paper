@@ -3,11 +3,11 @@ import os.path
 
 import pandas as pd
 
-import simulations.simulate_genotypes as geno
-import simulations.vcf_to_plink as vcf
-import simulations.simulate_traits as traits
-import simulations.run_plink_gwas as plink
 import simulations.correct_traits_pca as correct_traits
+import simulations.run_plink_gwas as plink
+import simulations.simulate_genotypes as geno
+import simulations.simulate_traits as traits
+import simulations.vcf_to_plink as vcf
 from simulations.plot_qq_plot_with_offset import qqplot_all
 
 
@@ -17,13 +17,13 @@ def main():
     file_prefix = os.path.join(data_path, data_set)
 
     # genotype simulation parameters
-    n_samples = 2500
-    sequence_length = 1_000_000
+    n_samples = 1250
+    sequence_length = 50_000_000
     maf = 0.05
-    thin_count = 10000
+    thin_count = 3000
 
     # trait simulation parameters
-    num_traits = 30
+    num_traits = 10
     n_causal = [100, 1000]
     heritability = [0.0, 0.5]
     parameters = list(itertools.product(n_causal, heritability))
@@ -36,7 +36,7 @@ def main():
     geno.msprime_sims(file_prefix, n_samples, sequence_length)
     vcf.vcf_to_plink(file_prefix, maf=maf)
     plink.pca(file_prefix, window_size, step_size, r2_threshold)
-    plink.thin_number_of_snps(file_prefix, thin_count)
+    plink.thin_number_of_snps(file_prefix, maf, thin_count)
 
     pvalue_dfs = []
     pvalue_pca_adjusted_dfs = []
@@ -47,8 +47,7 @@ def main():
         p_values_pca_adjusted = []
         for j in range(num_traits):
             traits_file = os.path.join(
-                data_path, f"{data_set}_n{n_causal}_h{heritability}_trait_{j+1:02d}"
-            )
+                data_path, f"{data_set}_n{n_causal}_h{heritability}_trait_{j+1:02d}")
             adjusted_traits_file = f"{traits_file}.pca_adjusted"
 
             traits.gcta(file_prefix, traits_file, n_causal, heritability)
@@ -64,7 +63,8 @@ def main():
             df = pd.read_csv(f"{traits_file}.epi.qt", delim_whitespace=True)
             p_values.append(df.dropna())
 
-            df = pd.read_csv(f"{adjusted_traits_file}.epi.qt", delim_whitespace=True)
+            df = pd.read_csv(
+                f"{adjusted_traits_file}.epi.qt", delim_whitespace=True)
             p_values_pca_adjusted.append(df.dropna())
 
         pv_df = pd.concat(p_values)
