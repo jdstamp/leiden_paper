@@ -10,45 +10,50 @@ import simulations.simulate_traits as traits
 import simulations.vcf_to_plink as vcf
 from simulations.plot_qq_plot_with_offset import qqplot_all
 
+import multiprocessing
+from joblib import Parallel, delayed
 
-def main():
-    data_path = "data/"
-    data_set = "stdpopsim"
-    file_prefix = os.path.join(data_path, data_set)
+num_cores = multiprocessing.cpu_count()
 
-    # genotype simulation parameters
-    n_samples = 1250
-    sequence_length = 50_000_000
-    maf = 0.05
-    thin_count = 3000
+# Configuration
+data_path = "data/"
+data_set = "stdpopsim"
+file_prefix = os.path.join(data_path, data_set)
+pvalues_file = f"{file_prefix}_p_values_subsampled.txt"
 
-    # trait simulation parameters
-    num_traits = 10
-    n_causal = [100, 1000]
-    heritability = [0.0, 0.5]
-    parameters = list(itertools.product(n_causal, heritability))
+traits_file_pattern = os.path.join(
+    data_path, "{data_set}_n{n_causal}_h{heritability}_trait_{j + 1:02d}")
+adjusted_traits_file_pattern = "{traits_file}.pca_adjusted"
 
-    # variant pruning parameters
-    window_size = 1000
-    step_size = 50
-    r2_threshold = 0.2
+# genotype simulation parameters
+n_samples = 1250
+sequence_length = 50_000_000
+maf = 0.05
+thin_count = 3000
+
+# trait simulation parameters
+num_traits = 10
+n_causal = [100, 1000]
+heritability = [0.0, 0.5]
+parameters = list(itertools.product(n_causal, heritability))
+
+# variant pruning parameters
+window_size = 1000
+step_size = 50
+r2_threshold = 0.2
+
+def plink_pipeline():
 
     geno.msprime_sims(file_prefix, n_samples, sequence_length)
     vcf.vcf_to_plink(file_prefix, maf=maf)
     plink.pca(file_prefix, window_size, step_size, r2_threshold)
     plink.thin_number_of_snps(file_prefix, maf, thin_count)
 
-    pvalue_dfs = []
-    pvalue_pca_adjusted_dfs = []
-
     for n_causal, heritability in parameters:
-        # Initialize an empty list to collect the "P" columns from the GWAS results
-        p_values = []
-        p_values_pca_adjusted = []
+
         for j in range(num_traits):
-            traits_file = os.path.join(
-                data_path, f"{data_set}_n{n_causal}_h{heritability}_trait_{j+1:02d}")
-            adjusted_traits_file = f"{traits_file}.pca_adjusted"
+            traits_file = traits_file_pattern.format(data_set=data_set, n_causal=n_causal, heritability=heritability, j=j)
+            adjusted_traits_file = adjusted_traits_file_pattern.format(traits_file=traits_file)
 
             traits.gcta(file_prefix, traits_file, n_causal, heritability)
             correct_traits.pc_adjust(
@@ -60,12 +65,26 @@ def main():
             plink.epistasis(file_prefix, traits_file)
             plink.epistasis(file_prefix, adjusted_traits_file)
 
+
+def qqplot_pvalues():
+    pvalue_dfs = []
+    pvalue_pca_adjusted_dfs = []
+
+    for n_causal, heritability in parameters:
+        # Initialize an empty list to collect the "P" columns from the GWAS results
+        p_values = []
+        p_values_pca_adjusted = []
+        for j in range(num_traits):
+            traits_file = traits_file_pattern.format(data_set=data_set, n_causal=n_causal, heritability=heritability, j=j)
+            adjusted_traits_file = adjusted_traits_file_pattern.format(traits_file=traits_file)
+
+
             df = pd.read_csv(f"{traits_file}.epi.qt", delim_whitespace=True)
-            p_values.append(df.dropna())
+            p_values.append(df.dropna().sample(frac=0.1))
 
             df = pd.read_csv(
                 f"{adjusted_traits_file}.epi.qt", delim_whitespace=True)
-            p_values_pca_adjusted.append(df.dropna())
+            p_values_pca_adjusted.append(df.dropna().sample(frac=0.1))
 
         pv_df = pd.concat(p_values)
         pv_adj_df = pd.concat(p_values_pca_adjusted)
@@ -91,4 +110,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # plink_pipeline()
+    qqplot_pvalues()
