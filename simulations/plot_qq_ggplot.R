@@ -12,7 +12,7 @@ args <- parser$parse_args()
 # Read the file into a tibble
 data <- read.csv(args$file_path)
 df <- as_tibble(data)
-
+dp <- list(rate=log(10))
 di <- "exp"
 de <- FALSE # enabling the detrend option
 
@@ -22,10 +22,11 @@ gg <- df %>% ggplot(mapping = aes(
 )) +
   theme_bw() +
   stat_qq_band(distribution = di,
+               dparams = dp,
                detrend = de,
                alpha = 0.5) +
-  stat_qq_line(distribution = di, detrend = de) +
-  stat_qq_point(distribution = di, detrend = de) +
+  stat_qq_line(distribution = di, dparams = dp, detrend = de) +
+  stat_qq_point(distribution = di, dparams = dp, detrend = de) +
   facet_grid(n_causal ~  adjusted + heritability) +
   theme(legend.position = "none") +
   labs(x = bquote("Theoretical Quantiles " -log[10](p)),
