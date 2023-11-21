@@ -30,10 +30,3 @@ def gcta(file_prefix, traits_file, n_causal, heritability, maf=0.05):
     causal.to_csv(causal_snps, header=None, index=None, sep="\t", mode="w")
 
     run(gcta_sim_cmd.split(" "))
-
-
-def plink_freq(file_prefix):
-    plink_freq_cmd = (
-        f"plink --bfile {file_prefix} --freq --allow-no-sex --out {file_prefix}"
-    )
-    run(plink_freq_cmd.split(" "))

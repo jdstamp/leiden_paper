@@ -1,5 +1,3 @@
-import os
-from pathlib import Path
 from subprocess import run
 
 
@@ -18,3 +16,4 @@ def pca(file_prefix, window_size, step_size, r2_threshold):
 def thin_number_of_snps(file_prefix, maf, thin_count):
     plink_thin_cmd = f"plink --vcf {file_prefix}.vcf --maf {maf} --extract {file_prefix}.prune.in --thin-count {thin_count} --out {file_prefix} --make-bed"
     run(plink_thin_cmd.split(" "))
+    print("DONE")

@@ -10,9 +10,10 @@ import simulations.run_plink_gwas as plink
 import simulations.simulate_genotypes as geno
 import simulations.simulate_traits as traits
 import simulations.vcf_to_plink as vcf
-from simulations.plot_qq_plot_with_offset import qqplot_all
+from simulations.plot_qqplot import qqplot_all
 
 import logging
+
 logging.basicConfig(level=logging.INFO)
 
 
@@ -26,19 +27,20 @@ file_prefix = os.path.join(data_path, data_set)
 pvalues_file = f"{file_prefix}_p_values_subsampled.txt"
 
 traits_file_pattern = os.path.join(
-    data_path, "{data_set}_n{n_causal}_h{heritability}_trait_{j:02d}")
+    data_path, "{data_set}_n{n_causal}_h{heritability}_trait_{j:02d}"
+)
 adjusted_traits_file_pattern = "{traits_file}.pca_adjusted"
 
 # genotype simulation parameters
-n_samples = 1250
-sequence_length = 50_000_000
+n_samples = 1250  # per population, we have 5000 samples in total
+sequence_length = 100_000_000  # 50_000_000 results in ~3400 SNPs after pruning
 maf = 0.05
 thin_count = 5000
 
 # trait simulation parameters
 num_traits = 10
 n_causal = [100, 1000]
-heritability = [0.0, 0.5]
+heritability = [0.5]
 parameters = list(itertools.product(n_causal, heritability))
 
 # variant pruning parameters
@@ -51,7 +53,6 @@ subsample_frac = 0.05
 
 
 def plink_pipeline():
-
     geno.msprime_sims(file_prefix, n_samples, sequence_length)
     vcf.vcf_to_plink(file_prefix, maf=maf)
     plink.pca(file_prefix, window_size, step_size, r2_threshold)
@@ -59,17 +60,19 @@ def plink_pipeline():
 
     for n_causal, heritability in parameters:
         logging.info(
-            f"Starting run with n_causal={n_causal}, heritability={heritability}")
+            f"Starting run with n_causal={n_causal}, heritability={heritability}"
+        )
         Parallel(n_jobs=num_cores)(
-            delayed(run_single_trait)(j, heritability, n_causal) for j in range(num_traits))
+            delayed(run_single_trait)(j, heritability, n_causal)
+            for j in range(num_traits)
+        )
 
 
 def run_single_trait(j, heritability, n_causal):
-    traits_file = traits_file_pattern.format(data_set=data_set,
-                                             n_causal=n_causal,
-                                             heritability=heritability, j=j)
-    adjusted_traits_file = adjusted_traits_file_pattern.format(
-        traits_file=traits_file)
+    traits_file = traits_file_pattern.format(
+        data_set=data_set, n_causal=n_causal, heritability=heritability, j=j + 1
+    )
+    adjusted_traits_file = adjusted_traits_file_pattern.format(traits_file=traits_file)
     traits.gcta(file_prefix, traits_file, n_causal, heritability)
     correct_traits.pc_adjust(
         f"{traits_file}.phen",
@@ -86,31 +89,33 @@ def qqplot_pvalues():
 
     for n_causal, heritability in parameters:
         logging.info(
-            f"Starting run with n_causal={n_causal}, heritability={heritability}")
+            f"Starting run with n_causal={n_causal}, heritability={heritability}"
+        )
         # Initialize an empty list to collect the "P" columns from the GWAS results
         p_values = []
         p_values_pca_adjusted = []
         for j in range(num_traits):
             traits_file = traits_file_pattern.format(
-                data_set=data_set, n_causal=n_causal, heritability=heritability, j=j+1)
+                data_set=data_set, n_causal=n_causal, heritability=heritability, j=j + 1
+            )
             adjusted_traits_file = adjusted_traits_file_pattern.format(
-                traits_file=traits_file)
+                traits_file=traits_file
+            )
 
             df = pd.read_csv(f"{traits_file}.epi.qt", delim_whitespace=True)
             p_values.append(df.dropna().sample(frac=subsample_frac))
 
-            df = pd.read_csv(
-                f"{adjusted_traits_file}.epi.qt", delim_whitespace=True)
-            p_values_pca_adjusted.append(
-                df.dropna().sample(frac=subsample_frac))
+            df = pd.read_csv(f"{adjusted_traits_file}.epi.qt", delim_whitespace=True)
+            p_values_pca_adjusted.append(df.dropna().sample(frac=subsample_frac))
 
         pv_df = pd.concat(p_values)
         pv_adj_df = pd.concat(p_values_pca_adjusted)
 
-        pv_df["heritability"] = f"H2 = {heritability}"
-        pv_df["n_causal"] = f"n_causal = {n_causal}"
-        pv_adj_df["heritability"] = f"H2 = {heritability}"
-        pv_adj_df["n_causal"] = f"n_causal = {n_causal}"
+        poligenicity = "low" if n_causal < 1000 else "high"
+        pv_df["heritability"] = heritability
+        pv_df["n_causal"] = poligenicity
+        pv_adj_df["heritability"] = heritability
+        pv_adj_df["n_causal"] = poligenicity
 
         columns_to_keep = ["P", "heritability", "n_causal"]
         pvalue_dfs.append(pv_df[columns_to_keep])
@@ -128,5 +133,5 @@ def qqplot_pvalues():
 
 
 if __name__ == "__main__":
-    # plink_pipeline()
+    plink_pipeline()
     qqplot_pvalues()

@@ -2,17 +2,20 @@
 name = "leiden-paper"
 version = "0.1.0"
 description = ""
-authors = [""]
+authors = [
+    "Ross P Byrne <rbyrne5@tcd.ie>",
+    "Julian Stamp <julian_stamp@brown.edu>"
+]
 readme = "README.md"
 packages = [{include = "leiden_paper"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-jupyter = "^1.0.0"
-demesdraw = "^0.4.0"
 stdpopsim = "^0.2.0"
 black = "^23.7.0"
 joblib = "^1.3.2"
+pandas = "^2.2.0"
+scipy = "^1.12.0"
 
 
 [build-system]
