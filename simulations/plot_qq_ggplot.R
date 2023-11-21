@@ -11,7 +11,12 @@ args <- parser$parse_args()
 
 # Read the file into a tibble
 data <- read.csv(args$file_path)
-df <- as_tibble(data)
+df <- as_tibble(data) %>%
+    filter(heritability > 0)
+ntest <- df %>%
+    group_by(adjusted, n_causal, heritability) %>%
+    summarize(n = n())
+print(ntest$n[1])
 dp <- list(rate=log(10))
 di <- "exp"
 de <- FALSE # enabling the detrend option
@@ -27,8 +32,9 @@ gg <- df %>% ggplot(mapping = aes(
                alpha = 0.5) +
   stat_qq_line(distribution = di, dparams = dp, detrend = de) +
   stat_qq_point(distribution = di, dparams = dp, detrend = de) +
-  facet_grid(n_causal ~  adjusted + heritability) +
+  facet_grid(n_causal ~  adjusted ) +
   theme(legend.position = "none") +
+  geom_hline(yintercept=-log10(0.05 / ntest$n[1]), linetype='dotted', col = 'red') +
   labs(x = bquote("Theoretical Quantiles " -log[10](p)),
        y = bquote("Sample Quantiles " -log[10](p)))
 

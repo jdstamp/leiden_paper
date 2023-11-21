@@ -1,3 +1,5 @@
+from joblib import Parallel, delayed
+import multiprocessing
 import itertools
 import os.path
 
@@ -13,8 +15,6 @@ from simulations.plot_qq_plot_with_offset import qqplot_all
 import logging
 logging.basicConfig(level=logging.INFO)
 
-import multiprocessing
-from joblib import Parallel, delayed
 
 num_cores = multiprocessing.cpu_count()
 
@@ -49,6 +49,7 @@ r2_threshold = 0.2
 # p-value subsampling for plotting
 subsample_frac = 0.05
 
+
 def plink_pipeline():
 
     geno.msprime_sims(file_prefix, n_samples, sequence_length)
@@ -57,7 +58,8 @@ def plink_pipeline():
     plink.thin_number_of_snps(file_prefix, maf, thin_count)
 
     for n_causal, heritability in parameters:
-        logging.info(f"Starting run with n_causal={n_causal}, heritability={heritability}")
+        logging.info(
+            f"Starting run with n_causal={n_causal}, heritability={heritability}")
         Parallel(n_jobs=num_cores)(
             delayed(run_single_trait)(j, heritability, n_causal) for j in range(num_traits))
 
@@ -83,21 +85,24 @@ def qqplot_pvalues():
     pvalue_pca_adjusted_dfs = []
 
     for n_causal, heritability in parameters:
-        logging.info(f"Starting run with n_causal={n_causal}, heritability={heritability}")
+        logging.info(
+            f"Starting run with n_causal={n_causal}, heritability={heritability}")
         # Initialize an empty list to collect the "P" columns from the GWAS results
         p_values = []
         p_values_pca_adjusted = []
         for j in range(num_traits):
-            traits_file = traits_file_pattern.format(data_set=data_set, n_causal=n_causal, heritability=heritability, j=j)
-            adjusted_traits_file = adjusted_traits_file_pattern.format(traits_file=traits_file)
-
+            traits_file = traits_file_pattern.format(
+                data_set=data_set, n_causal=n_causal, heritability=heritability, j=j+1)
+            adjusted_traits_file = adjusted_traits_file_pattern.format(
+                traits_file=traits_file)
 
             df = pd.read_csv(f"{traits_file}.epi.qt", delim_whitespace=True)
             p_values.append(df.dropna().sample(frac=subsample_frac))
 
             df = pd.read_csv(
                 f"{adjusted_traits_file}.epi.qt", delim_whitespace=True)
-            p_values_pca_adjusted.append(df.dropna().sample(frac=subsample_frac))
+            p_values_pca_adjusted.append(
+                df.dropna().sample(frac=subsample_frac))
 
         pv_df = pd.concat(p_values)
         pv_adj_df = pd.concat(p_values_pca_adjusted)
