@@ -25,7 +25,7 @@ The code relies on commandline tools such as [PLINK](https://www.cog-genomics.or
 The python dependencies are specified in the `pyproject.toml` file. The python dependencies can be managed with [Poetry](https://python-poetry.org/). To install the dependencies, run the following command in the root directory of the repository:
 
 ```bash
-poetry install
+poetry install --no-root
 ```
    
 ## R Dependencies:
