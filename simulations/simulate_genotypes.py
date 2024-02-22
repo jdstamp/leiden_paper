@@ -2,10 +2,7 @@ import stdpopsim
 import msprime
 
 
-def simulate():
-    n_samples = 1000
-    sequence_length = 100_000_000
-    file_prefix = "stdpopsim"
+def msprime_sims(file_prefix, n_samples, sequence_length):
     species = stdpopsim.get_species("HomSap")
     demo = species.get_demographic_model("AmericanAdmixture_4B11")
     ts = msprime.sim_ancestry(
@@ -33,7 +30,3 @@ def simulate():
         individual_names += pop_names
     with open(f"{file_prefix}.vcf", "w") as file:
         mts.write_vcf(file, individual_names=individual_names)
-
-
-if __name__ == "__main__":
-    simulate()
