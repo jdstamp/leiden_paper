@@ -37,8 +37,7 @@ install.packages(
   c(
     "argparse",
     "dplyr",
-    "ggplot2",
-    "qqplotr"
+    "ggplot2"
   )
 )
 ```
