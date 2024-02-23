@@ -15,12 +15,6 @@ ntest <- df %>%
   group_by(adjusted, n_causal, heritability) %>%
   summarize(n = n())
 
-#Split into 4 groups to add expected dists and order:
-datasub1 <- data[data$n_causal=="high"&data$adjusted=="unadjusted",]
-datasub2 <- data[data$n_causal=="low"&data$adjusted=="unadjusted",]
-datasub3 <- data[data$n_causal=="high"&data$adjusted=="PCA adjusted",]
-datasub4 <- data[data$n_causal=="low"&data$adjusted=="PCA adjusted",]
-
 ##########################################
 ###Generate conf int for a line at x=y based on number of SNPs:
 ##########################################
@@ -38,39 +32,16 @@ cupper = -log10(qbeta(
   shape2 = rev(seq(n_snps))
 ))
 
-#Add conf ints to each parameter set and order by -log(p):
-df1 <- data.frame(observed=-log10(sort(datasub1$P)),
-                 expected= -log10(ppoints(n_snps)),
-                 clower = clower,
-                 cupper = cupper,
-                 n_causal = datasub1$n_causal,
-                 heritability = datasub1$heritability,
-                 adjusted = datasub1$adjusted)
-df2 <- data.frame(observed=-log10(sort(datasub2$P)),
-                   expected= -log10(ppoints(n_snps)),
-                   clower = clower,
-                   cupper = cupper,
-                   n_causal = datasub2$n_causal,
-                   heritability = datasub2$heritability,
-                   adjusted = datasub2$adjusted)
-df3 <- data.frame(observed=-log10(sort(datasub3$P)),
-                  expected= -log10(ppoints(n_snps)),
-                  clower = clower,
-                  cupper = cupper,
-                  n_causal = datasub3$n_causal,
-                  heritability = datasub3$heritability,
-                  adjusted = datasub3$adjusted)
-df4 <- data.frame(observed=-log10(sort(datasub4$P)),
-                  expected= -log10(ppoints(n_snps)),
-                  clower = clower,
-                  cupper = cupper,
-                  n_causal = datasub4$n_causal,
-                  heritability = datasub4$heritability,
-                  adjusted = datasub4$adjusted)
-
-
-#Combine dataframes for plotting:
-df=rbind(df1,df2,df3,df4)
+###Sort Ps in each group and calculate expected values for plotting:
+df = df %>%
+  group_by(adjusted, n_causal, heritability) %>%
+  arrange(P, .by_group = TRUE) %>%
+  mutate(
+    cupper = cupper,
+    clower = clower,
+    expected= -log10(ppoints(n_snps)),
+    observed = -log10(P)
+  )
 
 #Plot qq with GWAS style x=y line + conf int:
 gg <- df %>%
