@@ -1,6 +1,6 @@
 # Population structure confounds regression-based epistasis detection
 
-The repository is part of the Supplementary Information for the paper "Are we making the right assumptions about epistasis?" by Balvert et al. (2024), XXXX.
+The repository is part of the Supplementary Information for the paper "Are we making the right assumptions about epistasis?" by Balvert et al. (2024), Genome Biology.
 
 The main script is `population_structure_pipeline.py` which simulates genotypes from a coalescent model with samples from four populations, and runs a regression-based epistasis analysis both with and without PCA based correction for population structure.
 
