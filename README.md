@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13940750.svg)](https://doi.org/10.5281/zenodo.13940750)
 # Population structure confounds regression-based epistasis detection
 
 The repository is part of the Supplementary Information for the paper "Are we making the right assumptions about epistasis?" by Balvert et al. (2024), Genome Biology.
